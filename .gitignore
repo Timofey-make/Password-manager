@@ -1,1 +1,15 @@
-users.db
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+
+# Базы данных и логи
+*.db
+*.sqlite
+*.log
+
+# IDE и системные файлы
+.idea/
+.vscode/
+.DS_Store
