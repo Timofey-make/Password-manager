@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор паролей</title>
+</head>
+<body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
+    <h1 style="color: #333; text-align: center; margin-bottom: 30px;">Генератор паролей</h1>
+
+    <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <form method="POST" action="{{ url_for('generator') }}">
+            {{ form.hidden_tag() }}
+
+            <div style="display: flex; align-items: center; margin-bottom: 15px; flex-wrap: wrap;">
+                {{ form.lengthen.label(style="min-width: 150px; margin-right: 15px; font-weight: bold;") }}
+                {{ form.lengthen(size=20, style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; flex: 1; min-width: 200px;") }}
+                {% for error in form.lengthen.errors %}
+                    <span style="color: #e74c3c; font-size: 14px; margin-left: 165px; margin-top: 5px; flex-basis: 100%;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+
+            <div style="display: flex; align-items: center; margin-bottom: 15px; flex-wrap: wrap;">
+                {{ form.byword.label(style="min-width: 150px; margin-right: 15px; font-weight: bold;") }}
+                {{ form.byword(size=20, style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; flex: 1; min-width: 200px;") }}
+                {% for error in form.byword.errors %}
+                    <span style="color: #e74c3c; font-size: 14px; margin-left: 165px; margin-top: 5px; flex-basis: 100%;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+
+            <div style="text-align: center;">
+                {{ form.submit(style="background-color: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px;") }}
+            </div>
+        </form>
+    </div>
+
+    {% if label %}
+    <div style="background: white; padding: 20px; margin-top: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h3 style="margin-top: 0; color: #333;">Результат:</h3>
+        <p style="font-family: monospace; font-size: 18px; word-break: break-all; background: #f9f9f9; padding: 10px; border-radius: 4px;">{{ label }}</p>
+    </div>
+    {% endif %}
+
+    <a href="/main" style="display: inline-block; margin-top: 20px; color: #3498db; text-decoration: none;">Назад</a>
+</body>
+</html>
