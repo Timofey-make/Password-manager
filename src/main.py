@@ -2,21 +2,23 @@ import random
 from flask import Flask, flash, render_template, redirect, url_for, session, request, abort
 import sqlite3
 from init import init_db
-from function import *
-from form import *
+import function
+import forms
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'veryverystrongkeypassword'
+
 
 @app.route('/')
 def slash():
     return redirect('/login')
 
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    form = RegisterForm()
+    form = forms.RegisterForm()
     if form.validate_on_submit():
-        hashed_password = hash_password(form.password.data)
+        hashed_password = function.hash_password(form.password.data)
         with sqlite3.connect('users.db') as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM users ORDER BY id DESC LIMIT 1")
@@ -27,7 +29,8 @@ def register():
             else:
                 new_id = 1
         try:
-            cursor.execute("INSERT INTO users (id, username, password) VALUES (?, ?, ?)", (new_id, form.username.data, hashed_password))
+            cursor.execute("INSERT INTO users (id, username, password) VALUES (?, ?, ?)",
+                           (new_id, form.username.data, hashed_password))
             conn.commit()
             flash('Регистрация прошла успешно!', 'success')
             return redirect(url_for('login'))
@@ -36,15 +39,16 @@ def register():
 
     return render_template('register.html', form=form)
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()
+    form = forms.LoginForm()
     if form.validate_on_submit():
-        hashed_password = hash_password(form.password.data)
+        hashed_password = function.hash_password(form.password.data)
         with sqlite3.connect('users.db') as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT id, username FROM users WHERE username = ? AND password = ?",
-                         (form.username.data, hashed_password))
+                           (form.username.data, hashed_password))
             user = cursor.fetchone()
 
         if user:
@@ -56,14 +60,15 @@ def login():
             flash('Непавильный логин или пароль', 'danger')
     return render_template('login.html', form=form)
 
+
 @app.route("/password-generator", methods=["GET", "POST"])
-@login_required
+@function.login_required
 def generator():
     label = 'Ничего не сгенерировано'
-    form = GeneratorForm()
+    form = forms.GeneratorForm()
     try:
         if form.validate_on_submit():
-            label = generator_password(form.lengthen.data, form.byword.data)
+            label = function.generator_password(form.lengthen.data, form.byword.data)
     except TypeError:
         flash('Число должно быть не меньше 6 и не больше 52')
 
@@ -71,18 +76,19 @@ def generator():
 
 
 @app.route('/change-password', methods=["GET", "POST"])
-@login_required
+@function.login_required
 def change_password():
-    form = ChangeForm()
+    form = forms.ChangeForm()
 
     if form.validate_on_submit():
         try:
             with sqlite3.connect('users.db') as conn:
-                conn.row_factory = sqlite3.Row # интерестная строчка которая нужна
+                conn.row_factory = sqlite3.Row  # интерестная строчка которая нужна
                 cursor = conn.cursor()
 
-                encrypted_password = encrypt(form.changedpassword.data)
-                cursor.execute("""UPDATE passwords SET password = ? WHERE name = ? AND username = ? AND user_id = ?""", (encrypted_password, form.name.data, form.username.data, session['user']))
+                encrypted_password = function.encrypt(form.changedpassword.data)
+                cursor.execute("""UPDATE passwords SET password = ? WHERE name = ? AND username = ? AND user_id = ?""",
+                               (encrypted_password, form.name.data, form.username.data, session['user']))
                 conn.commit()
                 flash('Пароль успешно изменён!', 'success')
                 return redirect(url_for('personal_main', user=session['user']))
@@ -96,10 +102,11 @@ def change_password():
 
     return render_template('change-password.html', form=form)
 
+
 @app.route('/delete-password', methods=["GET", "POST"])
-@login_required
+@function.login_required
 def delete_password():
-    form = DeleteForm()
+    form = forms.DeleteForm()
     if form.validate_on_submit():
         try:
             with sqlite3.connect('users.db') as conn:
@@ -124,11 +131,11 @@ def delete_password():
 
 
 @app.route('/add', methods=["GET", "POST"])
-@login_required
+@function.login_required
 def add():
-    form = NoteForm()
+    form = forms.NoteForm()
     if form.validate_on_submit():
-        data = encrypt(form.password.data)
+        data = function.encrypt(form.password.data)
         with sqlite3.connect('users.db') as conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -148,13 +155,13 @@ def add():
 
 
 @app.route('/main')
-@login_required
+@function.login_required
 def redirect_to_personal():
     return redirect(url_for('personal_main', user=session['user']))
 
 
 @app.route('/main/<int:user>', methods=["GET"])
-@login_required
+@function.login_required
 def personal_main(user):
     if user != session['user']:
         abort(403)
@@ -172,12 +179,13 @@ def personal_main(user):
         for note in encrypted_notes:
             name, username, encrypted_password = note
             try:
-                decrypted_password = decrypt(encrypted_password)
+                decrypted_password = function.decrypt(encrypted_password)
             except:
                 decrypted_password = "Ошибка расшифровки"
             notes.append((name, username, decrypted_password))
 
     return render_template("main.html", username=session['username'], notes=notes)
+
 
 init_db()
 app.run(host="0.0.0.0", port=81)

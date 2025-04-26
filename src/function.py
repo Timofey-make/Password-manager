@@ -7,15 +7,19 @@ import base64
 from flask import Flask, session, flash, redirect, url_for
 import base64
 
+
 # кодирование пароля
 def encrypt(text):
     return base64.b64encode(text.encode()).decode()
+
+
 # декодирование пароле
 def decrypt(encrypted_text):
     return base64.b64decode(encrypted_text.encode()).decode()
 
+
 # генератор паролей
-def generator_password(lenght, myword):
+def generator_password(length, myword):
     output = ''
     if len(myword) != 0:
         words = myword.split()
@@ -24,11 +28,15 @@ def generator_password(lenght, myword):
             words = json.load(f)
     special_chars = ["&", "#", "%", "$", "@", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
-    while len(output) < lenght:
-        output += random.choice(words)
-        output += random.choice(special_chars)
+    while len(output) < length:
+        random_num = random.randint(0, 1)
+        if random_num == 0:
+            output += random.choice(words)
+        else:
+            output += random.choice(special_chars)
 
-    return output[:lenght]
+    return output[:length]
+
 
 # проверка если в сессии пользователь (через фласк весь код переделовать)
 def login_required(f):
@@ -38,8 +46,11 @@ def login_required(f):
             flash('Пожалуйста, войдите в систему', 'danger')
             return redirect(url_for('login'))
         return f(*args, **kwargs)
+
     return decorated_function
+
 
 # хэширование пароля
 def hash_password(password):
+    """хэширование пароля"""
     return hashlib.sha256(password.encode()).hexdigest()
