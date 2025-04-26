@@ -17,45 +17,21 @@ def decrypt(encrypted_text):
 # генератор паролей
 def generator_password(lenght, myword):
     if len(myword) != 0:
-        word = myword.split()
+        words = myword.split()
     else:
         with open('../words.json', 'r', encoding='utf-8') as f:
-            word = json.load(f)
-    num = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-    chtk = ["&", "#", "%", "$", "@"]
-    password = ["num", "chtk", "word"]
+            words = json.load(f)
+    special_chars = ["&", "#", "%", "$", "@", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
-    a = []
-    b = 0
-    c = ""
-    d = False
-    e = False
+    while True:
+        output = random.choice(words)
+        if len(output) < lenght:
+            break
 
-    while e is False:
-        while d is False:
-            while len(a) < (lenght // 2):
-                a.append(random.choice(password))
-                b = b + 1
-            if ("num" in a and "word" in a and "chtk" in a) and (a[0] == "word"):
-                d = True
-            else:
-                a = []
-                b = 0
+    while len(output) < lenght:
+        output += random.choice(special_chars)
 
-        for i in a:
-            if i == "num":
-                c = c + random.choice(num)
-            elif i == "word":
-                c = c + random.choice(word)
-            else:
-                c = c + random.choice(chtk)
-
-        if len(c) == lenght:
-            e = True
-        else:
-            c = ""
-
-    return c
+    return output
 
 # проверка если в сессии пользователь (через фласк весь код переделовать)
 def login_required(f):
