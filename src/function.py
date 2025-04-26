@@ -16,6 +16,7 @@ def decrypt(encrypted_text):
 
 # генератор паролей
 def generator_password(lenght, myword):
+    output = ''
     if len(myword) != 0:
         words = myword.split()
     else:
@@ -23,15 +24,11 @@ def generator_password(lenght, myword):
             words = json.load(f)
     special_chars = ["&", "#", "%", "$", "@", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
-    while True:
-        output = random.choice(words)
-        if len(output) < lenght:
-            break
-
     while len(output) < lenght:
+        output += random.choice(words)
         output += random.choice(special_chars)
 
-    return output
+    return output[:lenght]
 
 # проверка если в сессии пользователь (через фласк весь код переделовать)
 def login_required(f):
