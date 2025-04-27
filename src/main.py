@@ -84,13 +84,19 @@ def change_password():
             with sqlite3.connect('users.db') as conn:
                 conn.row_factory = sqlite3.Row  # интерестная строчка которая нужна
                 cursor = conn.cursor()
-
-                encrypted_password = function.encrypt(form.changedpassword.data)
-                cursor.execute("""UPDATE passwords SET password = ? WHERE name = ? AND username = ? AND user_id = ?""",
-                               (encrypted_password, form.name.data, form.username.data, session['user']))
-                conn.commit()
-                flash('Пароль успешно изменён!', 'success')
-                return redirect(url_for('personal_main', user=session['user']))
+                cursor.execute(
+                    "SELECT 1 FROM passwords WHERE name = ? AND username = ? AND user_id = ?",
+                    (form.name.data, form.username.data, session['user'])
+                )
+                if not cursor.fetchone():
+                    flash('Запись не найдена', 'error')
+                else:
+                    encrypted_password = function.encrypt(form.changedpassword.data)
+                    cursor.execute("""UPDATE passwords SET password = ? WHERE name = ? AND username = ? AND user_id = ?""",
+                                   (encrypted_password, form.name.data, form.username.data, session['user']))
+                    conn.commit()
+                    flash('Пароль успешно изменён!', 'success')
+                    return redirect(url_for('personal_main', user=session['user']))
 
         except Exception as e:
             print('hello world'
