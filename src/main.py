@@ -79,7 +79,6 @@ def generator():
 @function.login_required
 def change_password():
     form = forms.ChangeForm()
-
     if form.validate_on_submit():
         try:
             with sqlite3.connect('users.db') as conn:
@@ -126,6 +125,7 @@ def delete_password():
                     flash('Пароль успешно удалён', 'success')
                     return redirect(url_for('personal_main', user=session['user']))
         except:
+            print('hello world')
             flash('Я РАБОТАЮ В 3 ЧАСА НОЧИ УЖЕ ЧАСОВ 5')
     return render_template('delete-password.html', form=form)
 

@@ -4,56 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body style="font-family: Arial, sans-serif; max-width: 400px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
-    <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        <h1 style="color: #333; text-align: center; margin-bottom: 25px;">Регистрация</h1>
+<body>
+    <h1>Зарегистрироваться</h1>
+    <form method="post" action="{{ url_for('register') }}">
+        {{ form.hidden_tag() }}
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <ul style="list-style: none; padding: 0; margin: 0 0 20px 0;">
-                {% for category, message in messages %}
-                    <li style="color: #{% if category == 'error' %}dc3545{% else %}28a745{% endif %};
-                                padding: 8px; background-color: #{% if category == 'error' %}f8d7da{% else %}d4edda{% endif %};
-                                border-radius: 4px; margin-bottom: 5px;">{{ message }}</li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
+        <div>
+            {{ form.username.label }}
+            {{ form.username() }}
+        </div>
 
-        <form method="POST" action="">
-            {{ form.hidden_tag() }}
+        <div>
+            {{ form.password.label }}
+            {{ form.password() }}
+        </div>
 
-            <div style="margin-bottom: 20px;">
-                {{ form.username.label(style="display: block; margin-bottom: 5px; font-weight: bold;") }}
-                {{ form.username(size=32, style="width: 100%; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box;") }}
-                {% if form.username.errors %}
-                    <ul style="list-style: none; padding: 0; margin: 5px 0 0 0;">
-                    {% for error in form.username.errors %}
-                        <li style="color: #dc3545; font-size: 14px;">{{ error }}</li>
-                    {% endfor %}
-                    </ul>
-                {% endif %}
-            </div>
+        <div>
+            {{ form.submit }}
+        </div>
+    </form>
 
-            <div style="margin-bottom: 25px;">
-                {{ form.password.label(style="display: block; margin-bottom: 5px; font-weight: bold;") }}
-                {{ form.password(size=32, style="width: 100%; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box;") }}
-                {% if form.password.errors %}
-                    <ul style="list-style: none; padding: 0; margin: 5px 0 0 0;">
-                    {% for error in form.password.errors %}
-                        <li style="color: #dc3545; font-size: 14px;">{{ error }}</li>
-                    {% endfor %}
-                    </ul>
-                {% endif %}
-            </div>
-
-            <div>
-                <button type="submit" style="width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer;">Зарегистрироваться</button>
-            </div>
-        </form>
-
-        <p style="text-align: center; margin-top: 20px;">Уже есть аккаунт? <a href="{{ url_for('login') }}" style="color: #007bff; text-decoration: none;">Войти</a></p>
+    <div>
+        <a href="/login">Войти</a>
     </div>
 </body>
 </html>
