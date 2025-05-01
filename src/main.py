@@ -92,8 +92,9 @@ def change_password():
                     flash('Запись не найдена', 'error')
                 else:
                     encrypted_password = function.encrypt(form.changedpassword.data)
-                    cursor.execute("""UPDATE passwords SET password = ? WHERE name = ? AND username = ? AND user_id = ?""",
-                                   (encrypted_password, form.name.data, form.username.data, session['user']))
+                    cursor.execute(
+                        """UPDATE passwords SET password = ? WHERE name = ? AND username = ? AND user_id = ?""",
+                        (encrypted_password, form.name.data, form.username.data, session['user']))
                     conn.commit()
                     flash('Пароль успешно изменён!', 'success')
                     return redirect(url_for('personal_main', user=session['user']))
@@ -109,29 +110,31 @@ def change_password():
 @app.route('/delete-password', methods=["GET", "POST"])
 @function.login_required
 def delete_password():
-    form = forms.DeleteForm()
-    if form.validate_on_submit():
-        try:
-            with sqlite3.connect('users.db') as conn:
-                cursor = conn.cursor()
-                cursor.execute(
-                    "SELECT 1 FROM passwords WHERE name = ? AND username = ? AND user_id = ?",
-                    (form.name.data, form.username.data, session['user'])
-                )
-                if not cursor.fetchone():
-                    flash('Запись не найдена', 'error')
-                else:
-                    cursor.execute(
-                        "DELETE FROM passwords WHERE name = ? AND username = ? AND user_id = ?",
-                        (form.name.data, form.username.data, session['user'])
-                    )
-                    conn.commit()
-                    flash('Пароль успешно удалён', 'success')
-                    return redirect(url_for('personal_main', user=session['user']))
-        except:
-            print('hello world')
-            flash('Я РАБОТАЮ В 3 ЧАСА НОЧИ УЖЕ ЧАСОВ 5')
-    return render_template('delete-password.html', form=form)
+    if request.method == 'GET':
+        name = request.args.get('name')
+        username = request.args.get('username')
+        if not name or not username:
+            flash('Не указаны обязательные поля', 'error')
+            return redirect(url_for('personal_main', user=session['user']))
+        return render_template('delete-password.html', name=name, username=username)
+
+    # Обработка POST-запроса
+    name = request.form.get('name')
+    username = request.form.get('username')
+
+    try:
+        with sqlite3.connect('users.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "DELETE FROM passwords WHERE name = ? AND username = ? AND user_id = ?",
+                (name, username, session['user'])
+            )
+            conn.commit()
+            flash('Пароль успешно удалён', 'success')
+    except Exception as e:
+        flash(f'Ошибка при удалении: {str(e)}', 'danger')
+
+    return redirect(url_for('personal_main', user=session['user']))
 
 
 @app.route('/add', methods=["GET", "POST"])

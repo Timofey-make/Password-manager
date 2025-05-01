@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+    <meta charset="UTF-8">
     <title>Личный кабинет</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
@@ -8,34 +9,34 @@
     <h1>Добро пожаловать, {{ username }}</h1>
     <h2>Ваши пароли от аккаунтов:</h2>
 
-    <!--
-    table - таблица
-    border - граница таблицы
-    tr - просто то что в таблице
-    th - заголовки столбцов таблицы
-    td - то что под заголовками
-     -->
-    <table border="1">
+    <table>
         <tr>
             <th>Сервис</th>
             <th>Логин</th>
             <th>Пароль</th>
+            <th>Действия</th>
         </tr>
 
-        {% for note in notes%}
+        {% for note in notes %}
         <tr>
             <td>{{ note[0] }}</td>
             <td>{{ note[1] }}</td>
             <td>{{ note[2] }}</td>
+            <td>
+                <a href="{{ url_for('delete_password', name=note[0], username=note[1]) }}"
+                   class="action-btn delete-btn"
+                   onclick="return confirm('Вы уверены, что хотите удалить этот пароль?')">
+                    Удалить
+                </a>
+            </td>
         </tr>
         {% endfor %}
     </table>
-    
-    <div>
-        <a href="/add">Добавить новый пароль</a>
+
+    <div class="action-links">
+        <a href="/add">Добавить пароль</a>
         <a href="/change-password">Изменить пароль</a>
-        <a href="/delete-password">Удалить пароль</a>
-        <a href="/password-generator">Сгенерировать пароль</a>
+        <a href="/password-generator">Генератор паролей</a>
     </div>
 </body>
 </html>

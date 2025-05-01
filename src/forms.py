@@ -33,3 +33,4 @@ class DeleteForm(FlaskForm):
     name = StringField('Назвавние сервиса')
     username = StringField("Логин")
     submit = SubmitField('Удалить')
+
