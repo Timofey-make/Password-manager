@@ -54,7 +54,7 @@ def login():
         if user:
             session['user'] = user[0]
             session['username'] = user[1]
-            flash('Вы успешно вошли!', 'success')
+            # flash('Вы успешно вошли!', 'success')
             return redirect(url_for('personal_main', user=user[0]))
         else:
             flash('Непавильный логин или пароль', 'danger')
@@ -94,8 +94,6 @@ def change_password():
                 return redirect(url_for('personal_main', user=session['user']))
 
         except Exception as e:
-            print('hello world'
-                  '')
             conn.rollback()
             flash(f'Ошибка при изменении пароля: {str(e)}', 'danger')
             return redirect(url_for('change_password'))
@@ -134,6 +132,9 @@ def delete_password():
 @function.login_required
 def add():
     form = forms.NoteForm()
+    # TODO: добавить генерацию пароля на страницу с добавлением пароля
+    # password = function.generator_password()
+    # form.password.data = password
     if form.validate_on_submit():
         data = function.encrypt(form.password.data)
         with sqlite3.connect('users.db') as conn:
