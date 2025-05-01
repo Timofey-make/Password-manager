@@ -29,8 +29,8 @@ def generator_password(length, myword):
     special_chars = ["&", "#", "%", "$", "@", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
     while len(output) < length:
-        random_num = random.randint(0, 1)
-        if random_num == 0:
+        random_num = random.randint(1, 10)
+        if random_num < 4:
             output += random.choice(words)
         else:
             output += random.choice(special_chars)

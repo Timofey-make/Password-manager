@@ -79,19 +79,24 @@ def generator():
 @function.login_required
 def change_password():
     form = forms.ChangeForm()
-
     if form.validate_on_submit():
         try:
             with sqlite3.connect('users.db') as conn:
                 conn.row_factory = sqlite3.Row  # интерестная строчка которая нужна
                 cursor = conn.cursor()
-
-                encrypted_password = function.encrypt(form.changedpassword.data)
-                cursor.execute("""UPDATE passwords SET password = ? WHERE name = ? AND username = ? AND user_id = ?""",
-                               (encrypted_password, form.name.data, form.username.data, session['user']))
-                conn.commit()
-                flash('Пароль успешно изменён!', 'success')
-                return redirect(url_for('personal_main', user=session['user']))
+                cursor.execute(
+                    "SELECT 1 FROM passwords WHERE name = ? AND username = ? AND user_id = ?",
+                    (form.name.data, form.username.data, session['user'])
+                )
+                if not cursor.fetchone():
+                    flash('Запись не найдена', 'error')
+                else:
+                    encrypted_password = function.encrypt(form.changedpassword.data)
+                    cursor.execute("""UPDATE passwords SET password = ? WHERE name = ? AND username = ? AND user_id = ?""",
+                                   (encrypted_password, form.name.data, form.username.data, session['user']))
+                    conn.commit()
+                    flash('Пароль успешно изменён!', 'success')
+                    return redirect(url_for('personal_main', user=session['user']))
 
         except Exception as e:
             conn.rollback()
@@ -124,6 +129,7 @@ def delete_password():
                     flash('Пароль успешно удалён', 'success')
                     return redirect(url_for('personal_main', user=session['user']))
         except:
+            print('hello world')
             flash('Я РАБОТАЮ В 3 ЧАСА НОЧИ УЖЕ ЧАСОВ 5')
     return render_template('delete-password.html', form=form)
 
