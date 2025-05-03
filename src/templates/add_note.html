@@ -61,9 +61,6 @@
 
                 // Вставляем пароль в поле
                 passwordField.value = password;
-
-                // Сохраняем в localStorage
-                saveFormData();
             });
 
             // Функция генерации пароля
@@ -77,25 +74,6 @@
                 }
                 return password;
             }
-
-            // Сохранение данных формы
-            function saveFormData() {
-                const formData = {
-                    name: document.getElementById('serviceName').value,
-                    username: document.getElementById('serviceUsername').value,
-                    password: document.getElementById('passwordField').value
-                };
-                localStorage.setItem('passwordFormData', JSON.stringify(formData));
-            }
-
-            // Восстановление данных при загрузке
-            const savedData = JSON.parse(localStorage.getItem('passwordFormData')) || {};
-            if (savedData.name) document.getElementById('serviceName').value = savedData.name;
-            if (savedData.username) document.getElementById('serviceUsername').value = savedData.username;
-            if (savedData.password) document.getElementById('passwordField').value = savedData.password;
-
-            // Сохранение при изменении полей
-            document.getElementById('passwordForm').addEventListener('input', saveFormData);
         });
     </script>
 </body>

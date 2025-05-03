@@ -42,6 +42,7 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    #TODO: если пользователь уже существует, и мы ввели неверный пароль,то выдавать ошибку
     form = forms.LoginForm()
     if form.validate_on_submit():
         hashed_password = function.hash_password(form.password.data)
@@ -57,7 +58,7 @@ def login():
             # flash('Вы успешно вошли!', 'success')
             return redirect(url_for('personal_main', user=user[0]))
         else:
-            flash('Непавильный логин или пароль', 'danger')
+            flash('Неправильный логин или пароль', 'danger')
     return render_template('login.html', form=form)
 
 
