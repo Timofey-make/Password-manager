@@ -15,7 +15,9 @@ def slash():
 
 
 @app.route('/register', methods=['GET', 'POST'])
-def register():
+def register(error=None):
+    if error is None:
+        error = request.args.get('error', '')
     form = forms.RegisterForm()
     if form.validate_on_submit():
         hashed_password = function.hash_password(form.password.data)
@@ -35,14 +37,15 @@ def register():
             flash('Регистрация прошла успешно!', 'success')
             return redirect(url_for('login'))
         except sqlite3.IntegrityError:
-            flash('Этот логин занят', 'danger')
+            return redirect(url_for("register", error='пользователь с таким логином уже есть', form=form))
 
-    return render_template('register.html', form=form)
+    return render_template('register.html', form=form, error=error)
 
 
 @app.route('/login', methods=['GET', 'POST'])
-def login():
-    #TODO: если пользователь уже существует, и мы ввели неверный пароль,то выдавать ошибку
+def login(error=None):
+    if error is None:
+        error = request.args.get('error', '')
     form = forms.LoginForm()
     if form.validate_on_submit():
         hashed_password = function.hash_password(form.password.data)
@@ -55,11 +58,10 @@ def login():
         if user:
             session['user'] = user[0]
             session['username'] = user[1]
-            # flash('Вы успешно вошли!', 'success')
             return redirect(url_for('personal_main', user=user[0]))
         else:
-            flash('Неправильный логин или пароль', 'danger')
-    return render_template('login.html', form=form)
+            return redirect(url_for("login", error="Неверный логин или пароль", form=form))
+    return render_template('login.html', form=form, error=error)
 
 
 @app.route("/password-generator", methods=["GET", "POST"])
@@ -78,7 +80,9 @@ def generator():
 
 @app.route('/change-password', methods=["GET", "POST"])
 @function.login_required
-def change_password():
+def change_password(error=None):
+    if error is None:
+        error = request.args.get('error', '')
     form = forms.ChangeForm()
     if form.validate_on_submit():
         try:
@@ -90,7 +94,7 @@ def change_password():
                     (form.name.data, form.username.data, session['user'])
                 )
                 if not cursor.fetchone():
-                    flash('Запись не найдена', 'error')
+                    return redirect(url_for('change_password', error="Неверный логин или пароль"))
                 else:
                     encrypted_password = function.encrypt(form.changedpassword.data)
                     cursor.execute(
@@ -105,7 +109,7 @@ def change_password():
             flash(f'Ошибка при изменении пароля: {str(e)}', 'danger')
             return redirect(url_for('change_password'))
 
-    return render_template('change-password.html', form=form)
+    return render_template('change-password.html', form=form, error=error)
 
 
 @app.route('/delete-password', methods=["GET", "POST"])
@@ -140,11 +144,10 @@ def delete_password():
 
 @app.route('/add', methods=["GET", "POST"])
 @function.login_required
-def add():
+def add(error=None):
+    if error is None:
+        error = request.args.get('error', '')
     form = forms.NoteForm()
-    # TODO: добавить генерацию пароля на страницу с добавлением пароля
-    # password = function.generator_password()
-    # form.password.data = password
     if form.validate_on_submit():
         data = function.encrypt(form.password.data)
         with sqlite3.connect('users.db') as conn:
@@ -155,14 +158,14 @@ def add():
             exists = cursor.fetchone()[0]  # Берём первый элемент кортежа (0 или 1)
 
             if exists:
-                flash('Это уже есть', 'danger')
+                return redirect(url_for("add", error="Такая запись уже есть", form=form))
             else:
                 cursor.execute("INSERT INTO passwords (user_id, name, username, password) VALUES (?, ?, ?, ?)",
                                (session['user'], form.name.data, form.username.data, data))
                 conn.commit()
                 flash('Пароль добавлен!', 'success')
                 return redirect(url_for('personal_main', user=session['user']))
-    return render_template('add_note.html', form=form)
+    return render_template('add_note.html', form=form, error=error)
 
 
 @app.route('/main')

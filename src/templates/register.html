@@ -8,6 +8,11 @@
 </head>
 <body>
     <h1>Зарегистрироваться</h1>
+    {% if error %}
+        <div class="error-message" style="color: red; margin-bottom: 15px;">
+            {{ error }}
+        </div>
+    {% endif %}
     <form method="post" action="{{ url_for('register') }}">
         {{ form.hidden_tag() }}
 

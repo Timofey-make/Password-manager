@@ -38,7 +38,7 @@
 
     <div class="action-links">
         <a href="/add">Добавить пароль</a>
-        <a href="/change-password">Изменить пароль</a>
+        <a href="{{ url_for('change_password', error='') }}">Изменить пароль</a>
         <a href="/password-generator">Генератор паролей</a>
     </div>
 </body>

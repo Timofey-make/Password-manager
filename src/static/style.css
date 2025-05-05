@@ -8,6 +8,15 @@ body {
     padding: 20px;
 }
 
+.error-message {
+    color: red;
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid red;
+    border-radius: 5px;
+    background-color: #ffeeee;
+}
+
 .login-button-container {
     position: fixed; /* или absolute, в зависимости от ваших нужд */
     top: 0;
