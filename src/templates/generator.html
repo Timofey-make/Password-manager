@@ -5,6 +5,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <div class="login-button-container">
+        <a href="/login" class="login-button">Выйти</a>
+    </div>
     <h1>Генератор паролей</h1>
 
     <form method="POST" action="{{ url_for('generator') }}">
