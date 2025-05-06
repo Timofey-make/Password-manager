@@ -134,6 +134,10 @@ def delete_password():
                 "DELETE FROM passwords WHERE name = ? AND username = ? AND user_id = ?",
                 (name, username, session['user'])
             )
+            cursor.execute(
+                "DELETE FROM share WHERE name = ? AND username = ? AND sendername = ?",
+                (name, username, session['username'])
+            )
             conn.commit()
             flash('Пароль успешно удалён', 'success')
     except Exception as e:
