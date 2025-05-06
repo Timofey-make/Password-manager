@@ -58,7 +58,7 @@ def login(error=None):
         if user:
             session['user'] = user[0]
             session['username'] = user[1]
-            return redirect(url_for('personal_main', user=user[0]))
+            return redirect(url_for('personal_main'))
         else:
             return redirect(url_for("login", error="Неверный логин или пароль", form=form))
     return render_template('login.html', form=form, error=error)
@@ -102,7 +102,7 @@ def change_password(error=None):
                         (encrypted_password, form.name.data, form.username.data, session['user']))
                     conn.commit()
                     flash('Пароль успешно изменён!', 'success')
-                    return redirect(url_for('personal_main', user=session['user']))
+                    return redirect(url_for('personal_main'))
 
         except Exception as e:
             conn.rollback()
@@ -120,7 +120,7 @@ def delete_password():
         username = request.args.get('username')
         if not name or not username:
             flash('Не указаны обязательные поля', 'error')
-            return redirect(url_for('personal_main', user=session['user']))
+            return redirect(url_for('personal_main'))
         return render_template('delete-password.html', name=name, username=username)
 
     # Обработка POST-запроса
@@ -139,7 +139,7 @@ def delete_password():
     except Exception as e:
         flash(f'Ошибка при удалении: {str(e)}', 'danger')
 
-    return redirect(url_for('personal_main', user=session['user']))
+    return redirect(url_for('personal_main'))
 
 
 @app.route('/add', methods=["GET", "POST"])
@@ -164,7 +164,7 @@ def add(error=None):
                                (session['user'], form.name.data, form.username.data, data))
                 conn.commit()
                 flash('Пароль добавлен!', 'success')
-                return redirect(url_for('personal_main', user=session['user']))
+                return redirect(url_for('personal_main'))
     return render_template('add_note.html', form=form, error=error)
 
 
@@ -221,7 +221,7 @@ def share_password(error=None):
                 conn.commit()
 
                 flash('Пароль успешно передан!', 'success')
-                return redirect(url_for('personal_main', user=session['user']))
+                return redirect(url_for('personal_main'))
 
         except Exception as e:
             print(f"Error: {str(e)}")
@@ -239,7 +239,6 @@ def share_password(error=None):
 def view_password():
     with sqlite3.connect("users.db") as conn:
         cursor = conn.cursor()
-        # Добавлена запятая после session["user"] чтобы создать кортеж
         cursor.execute("SELECT sendername, name, username, password FROM share WHERE ownername = ?", (session["user"],))
         encrypted_notes = cursor.fetchall()
 
@@ -255,23 +254,10 @@ def view_password():
 
 @app.route('/main')
 @function.login_required
-def redirect_to_personal():
-    return redirect(url_for('personal_main', user=session['user']))
-
-
-@app.route('/main/<int:user>', methods=["GET"])
-@function.login_required
-def personal_main(user):
-    if user != session['user']:
-        abort(403)
-    with sqlite3.connect('users.db') as conn:
+def personal_main():
+    with sqlite3.connect("users.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT username FROM users WHERE id = ?", (user,))
-        user_data = cursor.fetchone()
-        if not user_data:
-            abort(404)
-
-        cursor.execute("SELECT name, username, password FROM passwords WHERE user_id = ?", (user,))
+        cursor.execute("SELECT name, username, password FROM passwords WHERE user_id = ?", (session["user"],))
         encrypted_notes = cursor.fetchall()
 
         notes = []
@@ -282,9 +268,7 @@ def personal_main(user):
             except:
                 decrypted_password = "Ошибка расшифровки"
             notes.append((name, username, decrypted_password))
-
-    return render_template("main.html", username=session['username'], notes=notes)
-
+    return render_template("main.html", notes=notes, username=session['username'])
 
 init_db()
 app.run(host="0.0.0.0", port=81)
