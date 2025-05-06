@@ -24,7 +24,7 @@ def generator_password(length, myword):
     if len(myword) != 0:
         words = myword.split()
     else:
-        with open('../words.json', 'r', encoding='utf-8') as f:
+        with open('static/words.json', 'r', encoding='utf-8') as f:
             words = json.load(f)
     special_chars = ["&", "#", "%", "$", "@", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 

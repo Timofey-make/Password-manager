@@ -52,34 +52,28 @@
 
     <a href="{{ url_for('personal_main', user=session['user']) }}">← Назад к списку</a>
 
+    <script src="{{ url_for('static', filename='scripts/password-generator.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Находим кнопку и поле пароля
             const generateBtn = document.getElementById('generateBtn');
             const passwordField = document.getElementById('passwordField');
+            const passLength = document.getElementById('passLength');
+            const customWords = document.getElementById('customWords');
 
-            // Вешаем обработчик на кнопку
-            generateBtn.addEventListener('click', function() {
-                const length = parseInt(document.getElementById('passLength').value);
-                const includeSpecial = document.getElementById('includeSpecial').checked;
-
-                // Генерируем пароль
-                const password = generatePassword(length, includeSpecial);
-
-                // Вставляем пароль в поле
-                passwordField.value = password;
-            });
-
-            // Функция генерации пароля
-            function generatePassword(length, useSpecial) {
-                let chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-                if (useSpecial) chars += '!@#$%^&*()_+-=[]{}|;:,.<>?';
-
-                let password = '';
-                for (let i = 0; i < length; i++) {
-                    password += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
-                return password;
+            if (generateBtn && passwordField) {
+                generateBtn.addEventListener('click', async function() {
+                    try {
+                        const length = parseInt(passLength.value) || 12;
+                        const password = await passwordGenerator.generatePassword(
+                            length,
+                            customWords ? customWords.value : ''
+                        );
+                        passwordField.value = password;
+                    } catch (error) {
+                        console.error('Ошибка генерации пароля:', error);
+                        passwordField.value = 'Ошибка генерации';
+                    }
+                });
             }
         });
     </script>
