@@ -34,3 +34,8 @@ class DeleteForm(FlaskForm):
     username = StringField("Логин")
     submit = SubmitField('Удалить')
 
+class ShareForm(FlaskForm):
+    recipient_username = StringField("Логин получателя")
+    password = StringField("Подтвердите пароль")
+    submit = SubmitField("Поделиться")
+

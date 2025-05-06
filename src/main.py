@@ -168,6 +168,91 @@ def add(error=None):
     return render_template('add_note.html', form=form, error=error)
 
 
+@app.route("/share-password", methods=["GET", "POST"])
+@function.login_required
+def share_password(error=None):
+    error = request.args.get('error', '')
+    form = forms.ShareForm()
+    name = request.args.get('name')
+    username = request.args.get('username')
+
+    if not name or not username:
+        return redirect(url_for('share-password', error='Не указаны обязательные поля'))
+
+    if request.method == 'POST' and form.validate_on_submit():
+        password = form.password.data
+        recipient_username = form.recipient_username.data
+
+        try:
+            with sqlite3.connect("users.db") as conn:
+                conn.row_factory = sqlite3.Row
+                cursor = conn.cursor()
+                cursor.execute("SELECT id FROM users WHERE username = ?", (recipient_username,))
+                recipient = cursor.fetchone()
+                if not recipient:
+                    return redirect(url_for('share-password', error='Получатель не найден', name=name, username=username))
+                cursor.execute("""
+                    SELECT password FROM passwords 
+                    WHERE user_id = ? 
+                    AND name = ? 
+                    AND username = ?""",
+                    (session['user'], name, username))
+                password_data = cursor.fetchone()
+
+                if not password_data:
+                    return redirect(url_for('share-password', error='Запись не найдена', name=name, username=username))
+                decrypted_password = function.decrypt(password_data['password'])
+                if decrypted_password != password:
+                    flash('Неверный пароль', 'error')
+                    return redirect(url_for('share_password', error='Неверный пароль', name=name, username=username))
+                cursor.execute("""
+                    SELECT 1 FROM share 
+                    WHERE ownername = ? 
+                    AND sendername = ? 
+                    AND name = ? 
+                    AND username = ?""",
+                    (recipient['id'], session['username'], name, username))
+                if cursor.fetchone():
+                    return redirect(url_for('share_password', error='Вы уже делились этим паролем с данным пользователем', name=name, username=username))
+                cursor.execute("""
+                    INSERT INTO share (ownername, sendername, name, username, password) 
+                    VALUES (?, ?, ?, ?, ?)""",
+                    (recipient['id'], session['username'], name, username, password_data['password']))
+                conn.commit()
+
+                flash('Пароль успешно передан!', 'success')
+                return redirect(url_for('personal_main', user=session['user']))
+
+        except Exception as e:
+            print(f"Error: {str(e)}")
+            flash('Произошла ошибка при передаче пароля', 'error')
+            return redirect(url_for('share_password', name=name, username=username))
+
+    return render_template('share-password.html',
+                         name=name,
+                         username=username,
+                         form=form,
+                         error="")
+
+@app.route("/view-password", methods=["GET", "POST"])
+@function.login_required
+def view_password():
+    with sqlite3.connect("users.db") as conn:
+        cursor = conn.cursor()
+        # Добавлена запятая после session["user"] чтобы создать кортеж
+        cursor.execute("SELECT sendername, name, username, password FROM share WHERE ownername = ?", (session["user"],))
+        encrypted_notes = cursor.fetchall()
+
+        notes = []
+        for note in encrypted_notes:
+            sender_name, name, username, encrypted_password = note
+            try:
+                decrypted_password = function.decrypt(encrypted_password)
+            except:
+                decrypted_password = "Ошибка расшифровки"
+            notes.append((sender_name, name, username, decrypted_password))
+    return render_template("view-password.html", notes=notes, username=session['username'])
+
 @app.route('/main')
 @function.login_required
 def redirect_to_personal():
