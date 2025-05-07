@@ -132,7 +132,7 @@ def delete_password():
     try:
         with sqlite3.connect('users.db') as conn:
             cursor = conn.cursor()
-            if mode is True:
+            if mode == "True":
                 cursor.execute(
                     "DELETE FROM passwords WHERE name = ? AND username = ? AND user_id = ?",
                     (name, username, session['user'])
@@ -141,7 +141,7 @@ def delete_password():
                     "DELETE FROM share WHERE name = ? AND username = ? AND sendername = ?",
                     (name, username, session['username'])
                 )
-            elif mode is False:
+            elif mode == "False":
                 cursor.execute(
                     "DELETE FROM share WHERE name = ? AND username = ? AND ownername = ?",
                     (name, username, session['name']))
