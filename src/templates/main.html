@@ -26,12 +26,12 @@
             <td>{{ note[1] }}</td>
             <td>{{ note[2] }}</td>
             <td>
-                <a href="{{ url_for('delete_password', name=note[0], username=note[1]) }}"
+                <a href="{{ url_for('delete_password', name=note[0], username=note[1], mode=True)}}"
                    class="action-btn delete-btn"
                    onclick="return confirm('Вы уверены, что хотите удалить этот пароль?')">
                     Удалить
                 </a>
-                <a href="{{ url_for('share_password', name=note[0], username=note[1]) }}"
+                <a href="{{ url_for('share_password', name=note[0], username=note[1])}}"
                    class="action-btn share-btn"
                    onclick="return confirm('Вы уверены, что хотите поделиться этим паролем?')">
                     Поделиться

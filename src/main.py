@@ -118,26 +118,33 @@ def delete_password():
     if request.method == 'GET':
         name = request.args.get('name')
         username = request.args.get('username')
+        mode = request.args.get('mode')
         if not name or not username:
             flash('Не указаны обязательные поля', 'error')
             return redirect(url_for('personal_main'))
-        return render_template('delete-password.html', name=name, username=username)
+        return render_template('delete-password.html', name=name, username=username, mode=mode)
 
     # Обработка POST-запроса
     name = request.form.get('name')
     username = request.form.get('username')
+    mode = request.args.get('mode')
 
     try:
         with sqlite3.connect('users.db') as conn:
             cursor = conn.cursor()
-            cursor.execute(
-                "DELETE FROM passwords WHERE name = ? AND username = ? AND user_id = ?",
-                (name, username, session['user'])
-            )
-            cursor.execute(
-                "DELETE FROM share WHERE name = ? AND username = ? AND sendername = ?",
-                (name, username, session['username'])
-            )
+            if mode is True:
+                cursor.execute(
+                    "DELETE FROM passwords WHERE name = ? AND username = ? AND user_id = ?",
+                    (name, username, session['user'])
+                )
+                cursor.execute(
+                    "DELETE FROM share WHERE name = ? AND username = ? AND sendername = ?",
+                    (name, username, session['username'])
+                )
+            elif mode is False:
+                cursor.execute(
+                    "DELETE FROM share WHERE name = ? AND username = ? AND ownername = ?",
+                    (name, username, session['name']))
             conn.commit()
             flash('Пароль успешно удалён', 'success')
     except Exception as e:
