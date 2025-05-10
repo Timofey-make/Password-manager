@@ -8,11 +8,9 @@ import forms
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.config['SECRET_KEY'] = 'veryverystrongkeypassword'
 
-
 @app.route('/')
 def slash():
     return redirect('/login')
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register(error=None):
@@ -177,7 +175,6 @@ def add(error=None):
                 flash('Пароль добавлен!', 'success')
                 return redirect(url_for('personal_main'))
     return render_template('add_note.html', form=form, error=error)
-
 
 @app.route("/share-password", methods=["GET", "POST"])
 @function.login_required

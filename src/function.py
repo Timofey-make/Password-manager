@@ -13,7 +13,7 @@ def encrypt(text):
     return base64.b64encode(text.encode()).decode()
 
 
-# декодирование пароле
+# декодирование пароля
 def decrypt(encrypted_text):
     return base64.b64decode(encrypted_text.encode()).decode()
 
