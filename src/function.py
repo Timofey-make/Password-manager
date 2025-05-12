@@ -38,7 +38,7 @@ def generator_password(length, myword):
     return output[:length]
 
 
-# проверка если в сессии пользователь (через фласк весь код переделовать)
+# проверка если в сессии пользователь
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):

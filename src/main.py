@@ -85,7 +85,7 @@ def change_password(error=None):
     if form.validate_on_submit():
         try:
             with sqlite3.connect('users.db') as conn:
-                conn.row_factory = sqlite3.Row  # интерестная строчка которая нужна
+                conn.row_factory = sqlite3.Row
                 cursor = conn.cursor()
                 cursor.execute(
                     "SELECT 1 FROM passwords WHERE name = ? AND username = ? AND user_id = ?",

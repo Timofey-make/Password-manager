@@ -1,4 +1,3 @@
-/* Основные стили */
 body {
     display: flex;
     flex-direction: column;
@@ -18,11 +17,11 @@ body {
 }
 
 .login-button-container {
-    position: fixed; /* или absolute, в зависимости от ваших нужд */
+    position: fixed;
     top: 0;
     right: 0;
-    padding: 20px; /* отступ от краев */
-    z-index: 1000; /* чтобы кнопка была поверх других элементов */
+    padding: 20px;
+    z-index: 1000;
 }
 
 .login-button {
@@ -46,7 +45,6 @@ h1, h2 {
     text-align: center;
 }
 
-/* Формы */
 form {
     display: flex;
     flex-direction: column;
@@ -85,7 +83,6 @@ button {
     font-weight: bold;
 }
 
-/* Ссылки */
 a {
     display: inline-block;
     margin: 10px;
@@ -98,7 +95,6 @@ a:hover {
     text-decoration: underline;
 }
 
-/* Таблица */
 table {
     width: 100%;
     max-width: 800px;
@@ -118,7 +114,6 @@ th {
     font-weight: bold;
 }
 
-/* Кнопки действий */
 .action-btn {
     padding: 5px 10px;
     border-radius: 3px;
@@ -174,7 +169,6 @@ th {
     background-color: #f8f8f8;
 }
 
-/* Контейнеры */
 .action-links {
     margin: 20px 0;
     text-align: center;
@@ -186,9 +180,6 @@ th {
     gap: 10px;
 }
 
-/* Добавьте в конец файла: */
-
-/* Стили для генератора паролей */
 #generateBtn {
     background-color: #4CAF50;
     color: white;
