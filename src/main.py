@@ -140,9 +140,11 @@ def delete_password():
                     (name, username, session['username'])
                 )
             elif mode == "False":
+                print("Бэйби шарк")
+                print(name, username, session['user'])
                 cursor.execute(
                     "DELETE FROM share WHERE name = ? AND username = ? AND ownername = ?",
-                    (name, username, session['name']))
+                    (name, username, session['user']))
             conn.commit()
             flash('Пароль успешно удалён', 'success')
     except Exception as e:
